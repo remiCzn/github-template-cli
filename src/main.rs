@@ -14,9 +14,10 @@ async fn main() {
 async fn parse(args: Vec<String>) {
     if let Some(arg) = args.get(1) {
         match arg.as_str() {
-            "get-list" => println!("{:?}", get_list().await),
+            "get-list" => get_list().await,
             cmd => panic!("Unknown command: {}", cmd),
         }
+        .unwrap_or_else(|_| panic!("Can't execute command: {}", arg));
     } else {
         panic!("Not enoug arguments");
     }

@@ -26,5 +26,9 @@ pub async fn get_list() -> Result<Vec<String>, Box<dyn std::error::Error>> {
         .filter(|&x| x.r#type == "dir")
         .map(|x| x.clone().name)
         .collect();
+    println!("Template list:");
+    for x in &a {
+        println!("  - {}", x);
+    }
     Ok(a)
 }
