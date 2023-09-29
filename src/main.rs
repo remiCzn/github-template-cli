@@ -1,41 +1,38 @@
 extern crate core;
 
+use clap::Parser;
+
 use crate::cmd::create::download_template;
 use crate::cmd::get_list::get_list;
-use std::env;
 
 mod cmd;
 
-#[tokio::main]
-async fn main() {
-    let args: Vec<String> = env::args().collect();
-    parse(args).await;
+#[derive(Parser, Debug)]
+#[command(author = "remiCzn", version = "0.0.1")]
+pub enum Args {
+    GetList,
+    Pull { template_name: String, folder_name: String },
 }
 
-async fn parse(args: Vec<String>) {
-    if let Some(arg) = &args.get(1) {
-        match arg.as_str() {
-            "get-list" => {
-                let list = get_list()
-                    .await
-                    .expect("Error: Expected to get the template list ");
-                println!("Template list:");
-                for x in &list {
-                    println!("- {}", x.name);
-                }
+#[tokio::main]
+async fn main() {
+    // let args: Vec<String> = env::args().collect();
+    // parse(args).await;
+    let args = Args::parse();
+    match args {
+        Args::GetList => {
+            let list = get_list()
+                .await
+                .expect("Error: Expected to get the template list ");
+            println!("Template list:");
+            for x in &list {
+                println!("- {}", x.name);
             }
-            "create" => {
-                if let Some(name) = &args.get(2) {
-                    download_template(name.as_str())
-                        .await
-                        .expect("Error: Expected to download template files");
-                } else {
-                    panic!("Argument needed for 'create' command")
-                }
-            }
-            cmd => panic!("Unknown command: {}", cmd),
-        };
-    } else {
-        panic!("Not enoug arguments");
+        }
+        Args::Pull { template_name, folder_name: _ } => {
+            download_template(template_name.as_str())
+                .await
+                .expect("Error: Expected to download template files");
+        }
     }
 }
